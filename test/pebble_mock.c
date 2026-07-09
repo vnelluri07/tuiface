@@ -28,8 +28,9 @@ BatteryChargeState battery_state_service_peek(void) {
 }
 
 void battery_state_service_subscribe(void (*handler)(BatteryChargeState charge)) {}
+bool mock_clock_is_24h = false;
 bool clock_is_24h_style(void) {
-  return false;
+  return mock_clock_is_24h;
 }
 bool connection_service_peek_pebble_app_connection(void) {
   return true;

@@ -66,6 +66,7 @@ GColor get_source_color(ComplicationDataSource source) {
       return s_active_theme->status_red;
     case DATA_SOURCE_STEPS:
     case DATA_SOURCE_ACTIVE_MINUTES:
+    case DATA_SOURCE_WORLD_TIME:
       return s_active_theme->text_primary;
     case DATA_SOURCE_HEART_RATE:
       return s_active_theme->status_red;

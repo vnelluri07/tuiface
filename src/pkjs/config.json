@@ -61,6 +61,154 @@
             "value": "2"
           }
         ]
+      },
+      {
+        "type": "select",
+        "messageKey": "SETTINGS_TZ_OFFSET",
+        "defaultValue": "0",
+        "label": "World Clock Timezone",
+        "options": [
+          {
+            "label": "UTC-12 Baker Island",
+            "value": "-720"
+          },
+          {
+            "label": "UTC-11 Pago Pago",
+            "value": "-660"
+          },
+          {
+            "label": "UTC-10 Honolulu",
+            "value": "-600"
+          },
+          {
+            "label": "UTC-9:30 Marquesas",
+            "value": "-570"
+          },
+          {
+            "label": "UTC-9 Anchorage",
+            "value": "-540"
+          },
+          {
+            "label": "UTC-8 Los Angeles",
+            "value": "-480"
+          },
+          {
+            "label": "UTC-7 Denver",
+            "value": "-420"
+          },
+          {
+            "label": "UTC-6 Chicago",
+            "value": "-360"
+          },
+          {
+            "label": "UTC-5 New York",
+            "value": "-300"
+          },
+          {
+            "label": "UTC-4 Asuncion",
+            "value": "-240"
+          },
+          {
+            "label": "UTC-3:30 Newfoundland",
+            "value": "-210"
+          },
+          {
+            "label": "UTC-3 Sao Paulo",
+            "value": "-180"
+          },
+          {
+            "label": "UTC-2 Fernando de Noronha",
+            "value": "-120"
+          },
+          {
+            "label": "UTC-1 Cape Verde",
+            "value": "-60"
+          },
+          {
+            "label": "UTC+0 London",
+            "value": "0"
+          },
+          {
+            "label": "UTC+1 Paris",
+            "value": "60"
+          },
+          {
+            "label": "UTC+2 Cairo",
+            "value": "120"
+          },
+          {
+            "label": "UTC+3 Moscow",
+            "value": "180"
+          },
+          {
+            "label": "UTC+3:30 Tehran",
+            "value": "210"
+          },
+          {
+            "label": "UTC+4 Dubai",
+            "value": "240"
+          },
+          {
+            "label": "UTC+4:30 Kabul",
+            "value": "270"
+          },
+          {
+            "label": "UTC+5 Karachi",
+            "value": "300"
+          },
+          {
+            "label": "UTC+5:30 Mumbai",
+            "value": "330"
+          },
+          {
+            "label": "UTC+5:45 Kathmandu",
+            "value": "345"
+          },
+          {
+            "label": "UTC+6 Dhaka",
+            "value": "360"
+          },
+          {
+            "label": "UTC+6:30 Yangon",
+            "value": "390"
+          },
+          {
+            "label": "UTC+7 Bangkok",
+            "value": "420"
+          },
+          {
+            "label": "UTC+8 Singapore",
+            "value": "480"
+          },
+          {
+            "label": "UTC+8:45 Aus Central West",
+            "value": "525"
+          },
+          {
+            "label": "UTC+9 Tokyo",
+            "value": "540"
+          },
+          {
+            "label": "UTC+9:30 Adelaide",
+            "value": "570"
+          },
+          {
+            "label": "UTC+10 Sydney",
+            "value": "600"
+          },
+          {
+            "label": "UTC+11 Noumea",
+            "value": "660"
+          },
+          {
+            "label": "UTC+12 Auckland",
+            "value": "720"
+          },
+          {
+            "label": "UTC+13 Samoa",
+            "value": "780"
+          }
+        ]
       }
     ]
   },
@@ -120,6 +268,10 @@
           {
             "label": "AQI / UV Index (next 12h max)",
             "value": "18"
+          },
+          {
+            "label": "World Clock",
+            "value": "19"
           }
         ]
       },
@@ -172,6 +324,10 @@
           {
             "label": "AQI / UV Index (next 12h max)",
             "value": "18"
+          },
+          {
+            "label": "World Clock",
+            "value": "19"
           }
         ]
       },
@@ -216,6 +372,10 @@
           {
             "label": "UV Index (next 12h max)",
             "value": "17"
+          },
+          {
+            "label": "World Clock",
+            "value": "19"
           }
         ]
       },
@@ -260,6 +420,10 @@
           {
             "label": "UV Index (next 12h max)",
             "value": "17"
+          },
+          {
+            "label": "World Clock",
+            "value": "19"
           }
         ]
       },
@@ -304,6 +468,10 @@
           {
             "label": "UV Index (next 12h max)",
             "value": "17"
+          },
+          {
+            "label": "World Clock",
+            "value": "19"
           }
         ]
       }

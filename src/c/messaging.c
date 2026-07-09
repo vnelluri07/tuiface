@@ -51,6 +51,8 @@ void load_settings(void) {
     s_complication_slots[3].source = persist_read_int(PERSIST_KEY_SLOT_4);
   if (persist_exists(PERSIST_KEY_SLOT_5))
     s_complication_slots[4].source = persist_read_int(PERSIST_KEY_SLOT_5);
+  if (persist_exists(PERSIST_KEY_SETTINGS_TZ_OFFSET))
+    s_settings_tz_offset = persist_read_int(PERSIST_KEY_SETTINGS_TZ_OFFSET);
 }
 
 void request_weather() {
@@ -139,6 +141,12 @@ void inbox_received_callback(DictionaryIterator* iterator, void* context) {
   if (slot5) {
     s_complication_slots[4].source = tuple_get_int(slot5);
     persist_write_int(PERSIST_KEY_SLOT_5, s_complication_slots[4].source);
+  }
+
+  Tuple* tz_offset_tuple = dict_find(iterator, MESSAGE_KEY_SETTINGS_TZ_OFFSET);
+  if (tz_offset_tuple) {
+    s_settings_tz_offset = tuple_get_int(tz_offset_tuple);
+    persist_write_int(PERSIST_KEY_SETTINGS_TZ_OFFSET, s_settings_tz_offset);
   }
 
   // If units changed, request new weather immediately to fetch correct unit

@@ -19,6 +19,7 @@ int s_date_day = 10;
 int s_settings_theme = 0;        // 0 = Auto, 1 = Day, 2 = Night
 int s_settings_units = 0;        // 0 = Imperial, 1 = Metric
 int s_settings_date_format = 0;  // 0 = Weekday + ISO, 1 = ISO + Weekday, 2 = Full Text
+int s_settings_tz_offset = 0;    // UTC offset in minutes for World Clock (e.g. 330 = UTC+5:30)
 
 ComplicationDataSource s_left_sidebar_source = DATA_SOURCE_STEPS;
 ComplicationDataSource s_right_sidebar_source = DATA_SOURCE_BATTERY;
@@ -30,6 +31,48 @@ ComplicationSlot s_complication_slots[NUM_SLOTS] = {
     {.box_rect = {{70, 184}, {60, 36}}, .source = DATA_SOURCE_HEART_RATE},  // Bottom Center
     {.box_rect = {{130, 184}, {60, 36}}, .source = DATA_SOURCE_BLUETOOTH}   // Bottom Right
 };
+
+// Maps a UTC offset (in minutes) to a short city/zone label for the complication frame.
+const char* get_tz_label(int offset_minutes) {
+  switch (offset_minutes) {
+    case -720: return "BKR";   // Baker Island
+    case -660: return "PPG";   // Pago Pago
+    case -600: return "HNL";   // Honolulu
+    case -570: return "MRQ";   // Marquesas
+    case -540: return "ANC";   // Anchorage
+    case -480: return "LAX";   // Los Angeles
+    case -420: return "DEN";   // Denver
+    case -360: return "CHI";   // Chicago
+    case -300: return "NYC";   // New York
+    case -240: return "ASU";   // Asuncion
+    case -210: return "NST";   // Newfoundland
+    case -180: return "SAO";   // Sao Paulo
+    case -120: return "FRN";   // Fernando de Noronha
+    case -60:  return "CVT";   // Cape Verde
+    case 0:    return "LON";   // London
+    case 60:   return "PAR";   // Paris
+    case 120:  return "CAI";   // Cairo
+    case 180:  return "MSK";   // Moscow
+    case 210:  return "THR";   // Tehran
+    case 240:  return "DXB";   // Dubai
+    case 270:  return "AFG";   // Kabul
+    case 300:  return "KHI";   // Karachi
+    case 330:  return "MUM";   // Mumbai
+    case 345:  return "KTM";   // Kathmandu
+    case 360:  return "DAC";   // Dhaka
+    case 390:  return "RGN";   // Yangon
+    case 420:  return "BKK";   // Bangkok
+    case 480:  return "SGP";   // Singapore
+    case 525:  return "ACW";   // Aus Central West
+    case 540:  return "TOK";   // Tokyo
+    case 570:  return "ADL";   // Adelaide
+    case 600:  return "SYD";   // Sydney
+    case 660:  return "NOU";   // Noumea
+    case 720:  return "AKL";   // Auckland
+    case 780:  return "WST";   // Samoa
+    default:   return "TZ";
+  }
+}
 
 const char* get_source_label(ComplicationDataSource source) {
   switch (source) {
@@ -59,6 +102,8 @@ const char* get_source_label(ComplicationDataSource source) {
       return "UV";
     case DATA_SOURCE_AQI_UV:
       return "AQI/UV";
+    case DATA_SOURCE_WORLD_TIME:
+      return get_tz_label(s_settings_tz_offset);
     case DATA_SOURCE_EMPTY:
       return "";
     default:
@@ -175,6 +220,21 @@ void get_source_data(ComplicationDataSource source, char* val_buf, int val_len, 
         snprintf(uv_str, sizeof(uv_str), "%d", s_weather_uv);
       }
       snprintf(val_buf, val_len, "%s / %s", aqi_str, uv_str);
+      break;
+    }
+    case DATA_SOURCE_WORLD_TIME: {
+      time_t now = time(NULL);
+      // Target time = UTC + target_offset_seconds
+      time_t target_time = now + (s_settings_tz_offset * 60);
+      struct tm target_tm;
+      memcpy(&target_tm, gmtime(&target_time), sizeof(struct tm));
+      if (clock_is_24h_style()) {
+        snprintf(val_buf, val_len, "%02d:%02d", target_tm.tm_hour, target_tm.tm_min);
+      } else {
+        int hour12 = target_tm.tm_hour % 12;
+        if (hour12 == 0) hour12 = 12;
+        snprintf(val_buf, val_len, "%d:%02d", hour12, target_tm.tm_min);
+      }
       break;
     }
     default:

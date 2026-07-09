@@ -14,6 +14,7 @@ void setUp(void) {
   // Reset any global states if needed before each test
   s_settings_theme = 0;  // Auto
   s_settings_units = 0;  // Imperial
+  s_settings_tz_offset = 0;
   s_battery_level = 100;
   s_step_count = -1;
   s_sleep_seconds = -1;
@@ -21,6 +22,7 @@ void setUp(void) {
   s_weather_temp = -999;
   strcpy(s_weather_cond, "--");
   s_connected = true;
+  mock_clock_is_24h = false;
 }
 
 void tearDown(void) {}
@@ -69,6 +71,8 @@ void test_get_source_label_should_return_correct_labels(void) {
   TEST_ASSERT_EQUAL_STRING("UV", get_source_label(DATA_SOURCE_UV));
   TEST_ASSERT_EQUAL_STRING("AQI/UV", get_source_label(DATA_SOURCE_AQI_UV));
   TEST_ASSERT_EQUAL_STRING("", get_source_label(DATA_SOURCE_EMPTY));
+  s_settings_tz_offset = 0;
+  TEST_ASSERT_EQUAL_STRING("LON", get_source_label(DATA_SOURCE_WORLD_TIME));
 }
 
 void test_get_source_data_should_format_battery(void) {
@@ -634,6 +638,133 @@ void test_inbox_units_change_should_trigger_weather_refetch(void) {
   TEST_ASSERT_EQUAL_INT(before + expected_tick_fetches(), mock_outbox_sends);
 }
 
+void test_world_clock_label_should_map_offsets_to_cities(void) {
+  TEST_ASSERT_EQUAL_STRING("LON", get_tz_label(0));
+  TEST_ASSERT_EQUAL_STRING("NYC", get_tz_label(-300));
+  TEST_ASSERT_EQUAL_STRING("TOK", get_tz_label(540));
+  TEST_ASSERT_EQUAL_STRING("MUM", get_tz_label(330));
+  TEST_ASSERT_EQUAL_STRING("KTM", get_tz_label(345));
+  TEST_ASSERT_EQUAL_STRING("SYD", get_tz_label(600));
+  TEST_ASSERT_EQUAL_STRING("LAX", get_tz_label(-480));
+  TEST_ASSERT_EQUAL_STRING("THR", get_tz_label(210));
+  TEST_ASSERT_EQUAL_STRING("TZ", get_tz_label(999));  // Unknown offset
+
+  // Verify get_source_label delegates correctly
+  s_settings_tz_offset = 540;
+  TEST_ASSERT_EQUAL_STRING("TOK", get_source_label(DATA_SOURCE_WORLD_TIME));
+  s_settings_tz_offset = -300;
+  TEST_ASSERT_EQUAL_STRING("NYC", get_source_label(DATA_SOURCE_WORLD_TIME));
+}
+
+void test_world_clock_data_should_format_time_24h(void) {
+  char buf[16];
+  mock_clock_is_24h = true;
+
+  // The world clock computes: gmtime(now + offset_minutes * 60)
+  // So if offset = 0 (UTC), it should show current UTC time
+  time_t now = time(NULL);
+  struct tm utc_tm;
+  memcpy(&utc_tm, gmtime(&now), sizeof(struct tm));
+
+  s_settings_tz_offset = 0;  // UTC
+  get_source_data(DATA_SOURCE_WORLD_TIME, buf, sizeof(buf), NULL);
+  char expected[16];
+  snprintf(expected, sizeof(expected), "%02d:%02d", utc_tm.tm_hour, utc_tm.tm_min);
+  TEST_ASSERT_EQUAL_STRING(expected, buf);
+
+  // +60 minutes from UTC → one hour ahead of UTC
+  s_settings_tz_offset = 60;
+  get_source_data(DATA_SOURCE_WORLD_TIME, buf, sizeof(buf), NULL);
+  int expected_hour = (utc_tm.tm_hour + 1) % 24;
+  snprintf(expected, sizeof(expected), "%02d:%02d", expected_hour, utc_tm.tm_min);
+  TEST_ASSERT_EQUAL_STRING(expected, buf);
+}
+
+void test_world_clock_data_should_format_time_12h(void) {
+  char buf[16];
+  mock_clock_is_24h = false;
+
+  time_t now = time(NULL);
+  struct tm utc_tm;
+  memcpy(&utc_tm, gmtime(&now), sizeof(struct tm));
+
+  // UTC offset = 0, 12h format
+  s_settings_tz_offset = 0;
+  get_source_data(DATA_SOURCE_WORLD_TIME, buf, sizeof(buf), NULL);
+  int hour12 = utc_tm.tm_hour % 12;
+  if (hour12 == 0) hour12 = 12;
+  char expected[16];
+  snprintf(expected, sizeof(expected), "%d:%02d", hour12, utc_tm.tm_min);
+  TEST_ASSERT_EQUAL_STRING(expected, buf);
+}
+
+void test_world_clock_should_handle_half_hour_offsets(void) {
+  char buf[16];
+  mock_clock_is_24h = true;
+
+  time_t now = time(NULL);
+  struct tm utc_tm;
+  memcpy(&utc_tm, gmtime(&now), sizeof(struct tm));
+
+  // +30 minutes from UTC
+  s_settings_tz_offset = 30;
+  get_source_data(DATA_SOURCE_WORLD_TIME, buf, sizeof(buf), NULL);
+  int expected_min = utc_tm.tm_min + 30;
+  int expected_hour = utc_tm.tm_hour;
+  if (expected_min >= 60) {
+    expected_min -= 60;
+    expected_hour = (expected_hour + 1) % 24;
+  }
+  char expected[16];
+  snprintf(expected, sizeof(expected), "%02d:%02d", expected_hour, expected_min);
+  TEST_ASSERT_EQUAL_STRING(expected, buf);
+
+  // +330 (Mumbai = UTC+5:30)
+  s_settings_tz_offset = 330;
+  get_source_data(DATA_SOURCE_WORLD_TIME, buf, sizeof(buf), NULL);
+  // Verify it produces a valid HH:MM format
+  TEST_ASSERT_EQUAL(5, strlen(buf));
+  TEST_ASSERT_EQUAL(':', buf[2]);
+
+  // Negative offset: -570 (Marquesas = UTC-9:30)
+  s_settings_tz_offset = -570;
+  get_source_data(DATA_SOURCE_WORLD_TIME, buf, sizeof(buf), NULL);
+  // Should still produce valid HH:MM
+  TEST_ASSERT_EQUAL(5, strlen(buf));
+  TEST_ASSERT_EQUAL(':', buf[2]);
+}
+
+void test_world_clock_color_should_be_text_primary(void) {
+  s_active_theme = &s_theme_day;
+  TEST_ASSERT_EQUAL_HEX(s_theme_day.text_primary, get_source_color(DATA_SOURCE_WORLD_TIME));
+
+  s_active_theme = &s_theme_night;
+  TEST_ASSERT_EQUAL_HEX(s_theme_night.text_primary, get_source_color(DATA_SOURCE_WORLD_TIME));
+}
+
+void test_world_clock_settings_should_persist(void) {
+  mock_persist_reset();
+  mock_dict_reset();
+  mock_dict_add_cstring(MESSAGE_KEY_SETTINGS_TZ_OFFSET, "330");
+
+  inbox_received_callback(NULL, NULL);
+
+  TEST_ASSERT_EQUAL_INT(330, s_settings_tz_offset);
+  TEST_ASSERT_EQUAL_INT(330, persist_read_int(PERSIST_KEY_SETTINGS_TZ_OFFSET));
+
+  // Simulate relaunch
+  s_settings_tz_offset = 0;
+  load_settings();
+  TEST_ASSERT_EQUAL_INT(330, s_settings_tz_offset);
+
+  // Negative offset
+  mock_dict_reset();
+  mock_dict_add_cstring(MESSAGE_KEY_SETTINGS_TZ_OFFSET, "-300");
+  inbox_received_callback(NULL, NULL);
+  TEST_ASSERT_EQUAL_INT(-300, s_settings_tz_offset);
+  TEST_ASSERT_EQUAL_INT(-300, persist_read_int(PERSIST_KEY_SETTINGS_TZ_OFFSET));
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_to_upper_str_should_convert_lowercase_to_uppercase);
@@ -664,5 +795,11 @@ int main(void) {
   RUN_TEST(test_inbox_settings_only_message_should_not_stamp_weather_cache);
   RUN_TEST(test_inbox_should_parse_slot_assignments);
   RUN_TEST(test_inbox_units_change_should_trigger_weather_refetch);
+  RUN_TEST(test_world_clock_label_should_map_offsets_to_cities);
+  RUN_TEST(test_world_clock_data_should_format_time_24h);
+  RUN_TEST(test_world_clock_data_should_format_time_12h);
+  RUN_TEST(test_world_clock_should_handle_half_hour_offsets);
+  RUN_TEST(test_world_clock_color_should_be_text_primary);
+  RUN_TEST(test_world_clock_settings_should_persist);
   return UNITY_END();
 }

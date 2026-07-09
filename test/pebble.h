@@ -197,6 +197,7 @@ typedef struct {
 #define MESSAGE_KEY_SLOT_4 115
 #define MESSAGE_KEY_SLOT_5 116
 #define MESSAGE_KEY_UTC_OFFSET 117
+#define MESSAGE_KEY_SETTINGS_TZ_OFFSET 118
 
 // --- Function Prototypes ---
 void app_event_loop(void);
@@ -251,6 +252,7 @@ void mock_persist_reset(void);
 extern int32_t mock_heart_rate;
 extern int mock_vibes_count;
 extern int mock_outbox_sends;
+extern bool mock_clock_is_24h;
 void mock_dict_reset(void);
 void mock_dict_add_int(uint32_t key, int32_t value);
 void mock_dict_add_cstring(uint32_t key, const char* str);

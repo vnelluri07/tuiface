@@ -15,6 +15,7 @@ typedef enum {
   DATA_SOURCE_AQI = 16,
   DATA_SOURCE_UV = 17,
   DATA_SOURCE_AQI_UV = 18,
+  DATA_SOURCE_WORLD_TIME = 19,
   DATA_SOURCE_EMPTY = 20
 } ComplicationDataSource;
 
@@ -36,6 +37,7 @@ extern int s_date_day;
 extern int s_settings_theme;
 extern int s_settings_units;
 extern int s_settings_date_format;
+extern int s_settings_tz_offset;  // UTC offset in minutes for World Clock
 
 extern ComplicationDataSource s_left_sidebar_source;
 extern ComplicationDataSource s_right_sidebar_source;
