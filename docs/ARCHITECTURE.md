@@ -143,7 +143,7 @@ keys are hand-assigned and independent of `messageKeys` ordering.
 Unit tests live in `test/` and run on the host (no emulator needed):
 
 ```sh
-cd test && make test
+make test
 ```
 
 - `test_watchface.c` `#include`s the C source files directly (so static

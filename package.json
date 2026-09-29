@@ -1,7 +1,7 @@
 {
-  "name": "tuiface",
-  "author": "Elizardbeth",
-  "version": "1.1.0",
+  "name": "tuiface2",
+  "author": "vnelluri",
+  "version": "1.2.0",
   "license": "PolyForm-Noncommercial-1.0.0",
   "keywords": ["pebble-app"],
   "private": true,
@@ -9,8 +9,8 @@
     "@rebble/clay": "^1.0.3"
   },
   "pebble": {
-    "displayName": "tuiface",
-    "uuid": "a4bfc6a1-5c48-431f-b996-03b83f2ca653",
+    "displayName": "tuiFace2",
+    "uuid": "35a68f22-506a-49eb-adda-56935e25c3a0",
     "sdkVersion": "3",
     "enableMultiJS": true,
     "targetPlatforms": [
