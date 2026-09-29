@@ -1,6 +1,8 @@
 # Top-level developer entry points. The Pebble SDK build itself is `pebble
 # build` (see README); this Makefile wraps formatting and the host test suite.
 
+PYTHON ?= python3
+
 FORMAT_SRCS = $(wildcard src/c/*.c src/c/*.h) \
               src/pkjs/index.js \
               test/test_watchface.c test/pebble_mock.c test/pebble.h
@@ -14,7 +16,7 @@ format-check:
 	clang-format --dry-run -Werror $(FORMAT_SRCS)
 
 metadata-test:
-	python3 test/test_package_metadata.py
+	$(PYTHON) test/test_package_metadata.py
 
 test: format-check metadata-test
 	$(MAKE) -C test test

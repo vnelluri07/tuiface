@@ -97,7 +97,7 @@ pebble install --phone <ip>           # install to a paired phone
 Run the unit tests (host-only, no SDK needed):
 
 ```sh
-cd test && make test
+make test
 ```
 
 ## Development
