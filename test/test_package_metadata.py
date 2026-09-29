@@ -1,11 +1,16 @@
 import json
+import re
 from pathlib import Path
 from uuid import UUID
 
 
-PACKAGE_PATH = Path(__file__).resolve().parents[1] / "package.json"
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+PACKAGE_PATH = REPOSITORY_ROOT / "package.json"
+CONFIG_PATH = REPOSITORY_ROOT / "src" / "pkjs" / "config.json"
 UPSTREAM_UUID = "a4bfc6a1-5c48-431f-b996-03b83f2ca653"
 EXPECTED_UUID = "35a68f22-506a-49eb-adda-56935e25c3a0"
+UPSTREAM_VERSION = (1, 1, 0)
+VERSION_PATTERN = re.compile(r"\d+\.\d+\.\d+")
 
 
 def require_equal(actual, expected, description):
@@ -17,6 +22,20 @@ def require_equal(actual, expected, description):
 
 with PACKAGE_PATH.open(encoding="utf-8") as package_file:
     package = json.load(package_file)
+
+with CONFIG_PATH.open(encoding="utf-8") as config_file:
+    config = json.load(config_file)
+
+configuration_heading = next(
+    (item for item in config if item.get("type") == "heading"), None
+)
+if configuration_heading is None:
+    raise AssertionError("Clay configuration must contain a top-level heading")
+require_equal(
+    configuration_heading.get("defaultValue"),
+    "tuiFace2 Settings",
+    "configuration heading",
+)
 
 pebble = package["pebble"]
 
@@ -40,7 +59,21 @@ if actual_uuid != UUID(EXPECTED_UUID):
 
 require_equal(package["name"], "tuiface2", "package name")
 require_equal(package["author"], "vnelluri", "package author")
-require_equal(package["version"], "1.2.0", "package version")
+
+actual_version = package["version"]
+if not isinstance(actual_version, str) or VERSION_PATTERN.fullmatch(actual_version) is None:
+    raise AssertionError(
+        "package version must contain three dot-separated integers, "
+        f"got {actual_version!r}"
+    )
+parsed_version = tuple(int(component) for component in actual_version.split("."))
+if parsed_version <= UPSTREAM_VERSION:
+    upstream_version_text = ".".join(str(component) for component in UPSTREAM_VERSION)
+    raise AssertionError(
+        f"package version must be greater than upstream {upstream_version_text!r}, "
+        f"got {actual_version!r}"
+    )
+
 require_equal(pebble["displayName"], "tuiFace2", "Pebble displayName")
 
 message_keys = pebble["messageKeys"]
