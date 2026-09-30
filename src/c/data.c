@@ -35,42 +35,78 @@ ComplicationSlot s_complication_slots[NUM_SLOTS] = {
 // Maps a UTC offset (in minutes) to a short city/zone label for the complication frame.
 const char* get_tz_label(int offset_minutes) {
   switch (offset_minutes) {
-    case -720: return "BKR";   // Baker Island
-    case -660: return "PPG";   // Pago Pago
-    case -600: return "HNL";   // Honolulu
-    case -570: return "MRQ";   // Marquesas
-    case -540: return "ANC";   // Anchorage
-    case -480: return "LAX";   // Los Angeles
-    case -420: return "DEN";   // Denver
-    case -360: return "CHI";   // Chicago
-    case -300: return "NYC";   // New York
-    case -240: return "ASU";   // Asuncion
-    case -210: return "NST";   // Newfoundland
-    case -180: return "SAO";   // Sao Paulo
-    case -120: return "FRN";   // Fernando de Noronha
-    case -60:  return "CVT";   // Cape Verde
-    case 0:    return "LON";   // London
-    case 60:   return "PAR";   // Paris
-    case 120:  return "CAI";   // Cairo
-    case 180:  return "MSK";   // Moscow
-    case 210:  return "THR";   // Tehran
-    case 240:  return "DXB";   // Dubai
-    case 270:  return "AFG";   // Kabul
-    case 300:  return "KHI";   // Karachi
-    case 330:  return "MUM";   // Mumbai
-    case 345:  return "KTM";   // Kathmandu
-    case 360:  return "DAC";   // Dhaka
-    case 390:  return "RGN";   // Yangon
-    case 420:  return "BKK";   // Bangkok
-    case 480:  return "SGP";   // Singapore
-    case 525:  return "ACW";   // Aus Central West
-    case 540:  return "TOK";   // Tokyo
-    case 570:  return "ADL";   // Adelaide
-    case 600:  return "SYD";   // Sydney
-    case 660:  return "NOU";   // Noumea
-    case 720:  return "AKL";   // Auckland
-    case 780:  return "WST";   // Samoa
-    default:   return "TZ";
+    case -720:
+      return "BKR";  // Baker Island
+    case -660:
+      return "PPG";  // Pago Pago
+    case -600:
+      return "HNL";  // Honolulu
+    case -570:
+      return "MRQ";  // Marquesas
+    case -540:
+      return "ANC";  // Anchorage
+    case -480:
+      return "LAX";  // Los Angeles
+    case -420:
+      return "DEN";  // Denver
+    case -360:
+      return "CHI";  // Chicago
+    case -300:
+      return "NYC";  // New York
+    case -240:
+      return "ASU";  // Asuncion
+    case -210:
+      return "NST";  // Newfoundland
+    case -180:
+      return "SAO";  // Sao Paulo
+    case -120:
+      return "FRN";  // Fernando de Noronha
+    case -60:
+      return "CVT";  // Cape Verde
+    case 0:
+      return "LON";  // London
+    case 60:
+      return "PAR";  // Paris
+    case 120:
+      return "CAI";  // Cairo
+    case 180:
+      return "MSK";  // Moscow
+    case 210:
+      return "THR";  // Tehran
+    case 240:
+      return "DXB";  // Dubai
+    case 270:
+      return "AFG";  // Kabul
+    case 300:
+      return "KHI";  // Karachi
+    case 330:
+      return "MUM";  // Mumbai
+    case 345:
+      return "KTM";  // Kathmandu
+    case 360:
+      return "DAC";  // Dhaka
+    case 390:
+      return "RGN";  // Yangon
+    case 420:
+      return "BKK";  // Bangkok
+    case 480:
+      return "SGP";  // Singapore
+    case 525:
+      return "ACW";  // Aus Central West
+    case 540:
+      return "TOK";  // Tokyo
+    case 570:
+      return "ADL";  // Adelaide
+    case 600:
+      return "SYD";  // Sydney
+    case 660:
+      return "NOU";  // Noumea
+    case 720:
+      return "AKL";  // Auckland
+    case 780:
+      return "WST";  // Samoa
+    default:
+      return "TZ";
   }
 }
 
